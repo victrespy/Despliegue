@@ -1,0 +1,30 @@
+services:
+  web:
+    build: 
+      context: ./services/web #la ruta donde esta los archivos
+      dockerfile: Dockerfile #el nombre del dockerfile, tiene mas info para que esto no sea tan largo
+    ports:
+      - "8080:80" #la conexion entre puertos / El puerto http por defecto es 80 y https es 443
+    depends_on:
+      - db
+  db:
+    image: mariadb:10.5
+    environment: #variables de entorno
+      MYSQL_USER: user
+      MYSQL_ROOT_USER: root
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+    volumes:
+    #(ruta donde tenemos el archivo):(ruta donde queremos que se levante)
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+  phpmyadmin:
+    image: phpmyadmin:5
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: user
+      PMA_PASSWORD: pass
+    depends_on:
+      - db
