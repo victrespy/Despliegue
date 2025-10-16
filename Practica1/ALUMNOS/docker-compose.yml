@@ -3,28 +3,73 @@ services:
     build: 
       context: ./services/web #la ruta donde esta los archivos
       dockerfile: Dockerfile #el nombre del dockerfile, tiene mas info para que esto no sea tan largo
-    ports:
-      - "8080:80" #la conexion entre puertos / El puerto http por defecto es 80 y https es 443
+    #ports:  #(ahora lo gestiona nginx)
+    #  - "${WEB_PORT}:80" #la conexion entre puertos / El puerto http por defecto es 80 y https es 443
+    expose: 
+      - "80" #expone el puerto 80 para que otros servicios puedan acceder a el
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
   db:
     image: mariadb:10.5
     environment: #variables de entorno
-      MYSQL_USER: user
-      MYSQL_ROOT_USER: root
-      MYSQL_PASSWORD: pass
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: testdb
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
     #(ruta donde tenemos el archivo):(ruta donde queremos que se levante)
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    #para que no se pierdan los datos al reiniciar el contenedor (no entinendo bien esto)
+      - dbdata:/var/lib/mysql
+    healthcheck: #el objetivo de esto es comprobar que la base de datos este levantada antes de levantar otras cosas
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+    networks:
+      - backend
   phpmyadmin:
     image: phpmyadmin:5
     ports:
-      - "8081:80"
-    environment:
+      - "${PMA_PORT}:80" #el puerto que usa phpmyadmin
+    environment: #variables de entorno
       PMA_HOST: db
-      PMA_USER: user
-      PMA_PASSWORD: pass
-    depends_on:
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on: #se asegura que la base de datos este levantada antes que phpmyadmin
       - db
+    networks:
+      - frontend
+      - backend
+
+proxy: # no entiendo bien esto
+    image: nginx:alpine
+    ports:
+      - "80:80"    # Para redirigir HTTP a HTTPS
+      - "443:443"  # HTTPS estándar (puedes usar "8443:443" si lo requiere el PDF)
+    volumes:
+      # Monta la configuración del proxy
+      - ./services/nginx/conf.d:/etc/nginx/conf.d:ro
+      # Monta los certificados SSL/TLS
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      web:
+        condition: service_started
+    networks:
+      - frontend
+      - backend
+
+#es necesario declarar todos los volumenes creados al final     
+volumes:
+  dbdata:
+
+#es necesario declarar todas las redes creadas al final (no se que funcion cumplen las redes aun)
+networks:
+  frontend:
+  backend:
