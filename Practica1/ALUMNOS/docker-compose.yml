@@ -48,7 +48,7 @@ services:
       - frontend
       - backend
 
-proxy: # no entiendo bien esto
+  proxy: # no entiendo bien esto
     image: nginx:alpine
     ports:
       - "80:80"    # Para redirigir HTTP a HTTPS
