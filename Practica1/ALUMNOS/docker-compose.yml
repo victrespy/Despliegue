@@ -52,7 +52,7 @@ services:
     image: nginx:alpine
     ports:
       - "80:80"    # Para redirigir HTTP a HTTPS
-      - "443:443"  # HTTPS estándar (puedes usar "8443:443" si lo requiere el PDF)
+      - "8443:443"  # Puerto HTTPS, he puesto 8443 para que conecte con el nginx
     volumes:
       # Monta la configuración del proxy
       - ./services/nginx/conf.d:/etc/nginx/conf.d:ro
