@@ -2,7 +2,7 @@
 set -e
 
 # Establecer valores por defecto (en caso de no estar en el .env)
-: "${SLEEP_SECONDS:=60}"
+: "${SLEEP_SECONDS:=600}"
 : "${MYSQL_HOST:=db}" # El nombre del servicio de la BD
 : "${MYSQL_USER:=root}"
 : "${MYSQL_PASSWORD:=rootpass}"

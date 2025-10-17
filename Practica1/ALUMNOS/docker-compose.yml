@@ -52,6 +52,7 @@ services:
     ports:
       - "80:80"    # Para redirigir HTTP a HTTPS
       - "8443:443"  # Puerto HTTPS, he puesto 8443 para que conecte con el nginx
+      - "8080:8080" # Puerto para acceder a la aplicación en Tomcat
     volumes:
       # Monta la configuración del proxy
       - ./services/nginx/conf.d:/etc/nginx/conf.d:ro
@@ -77,6 +78,16 @@ services:
     command: sh -c "apk add --no-cache mariadb-client && sh /backup.sh"
     depends_on:
       - db
+    networks:
+      - backend
+
+  tomcat: 
+    image: tomcat:9.0
+    expose: 
+      - "8080" # Exponemos el puerto interno de Tomcat para el proxy
+    volumes:
+      # Montamos la aplicación .war en el directorio de webapps de Tomcat
+      - ./services/tomcat/webapps/sample.war:/usr/local/tomcat/webapps/sample.war
     networks:
       - backend
 
