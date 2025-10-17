@@ -24,8 +24,8 @@ services:
     volumes:
     #(ruta donde tenemos el archivo):(ruta donde queremos que se levante)
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    #para que no se pierdan los datos al reiniciar el contenedor (no entinendo bien esto)
-      - dbdata:/var/lib/mysql
+    #para que no se pierdan los datos al reiniciar el contenedor
+      - dbdata:/var/lib/mysql #indico la carpeta del contenedor que no se tiene que borrar
     healthcheck: #el objetivo de esto es comprobar que la base de datos este levantada antes de levantar otras cosas
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
       interval: 5s
@@ -45,7 +45,6 @@ services:
     depends_on: #se asegura que la base de datos este levantada antes que phpmyadmin
       - db
     networks:
-      - frontend
       - backend
 
   proxy: # no entiendo bien esto
@@ -65,11 +64,27 @@ services:
       - frontend
       - backend
 
+  backup:
+    image: alpine:3
+    environment:
+      # Pasamos la contraseña al script
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+    volumes:
+      # Montar el script de backup.sh
+      - ./scripts/backup.sh:/backup.sh:ro
+      # Montar la carpeta de backups (debe ser el mismo nombre que en el script)
+      - ./backups:/backups
+    command: sh -c "apk add --no-cache mariadb-client && sh /backup.sh"
+    depends_on:
+      - db
+    networks:
+      - backend
+
 #es necesario declarar todos los volumenes creados al final     
 volumes:
   dbdata:
 
-#es necesario declarar todas las redes creadas al final (no se que funcion cumplen las redes aun)
+#es necesario declarar todas las redes creadas al final
 networks:
   frontend:
   backend:
