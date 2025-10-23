@@ -50,7 +50,7 @@ services:
   proxy: # no entiendo bien esto
     image: nginx:alpine
     ports:
-      - "80:80"    # Para redirigir HTTP a HTTPS
+      - "88:80"    # Para redirigir HTTP a HTTPS
       - "8443:443"  # Puerto HTTPS, he puesto 8443 para que conecte con el nginx
       - "8080:8080" # Puerto para acceder a la aplicación en Tomcat
     volumes:
