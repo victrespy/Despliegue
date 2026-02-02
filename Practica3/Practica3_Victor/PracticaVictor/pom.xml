@@ -18,7 +18,7 @@
     Versión de Java con la que compilamos.
     Recomendación docente: usar 17 para evitar diferencias entre equipos.
     -->
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
  </properties>
 
@@ -39,22 +39,25 @@
     </dependency>
  </dependencies>
  <build>
-    <!--
-    finalName controla el nombre del fichero generado, generará:
-    target/calculadora.war
-    (Esto es útil para Docker)
-    -->
     <finalName>calculadora</finalName>
     <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version> 
+            <configuration>
+                <release>21</release>
+            </configuration>
+        </plugin>
+
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <version>3.4.0</version>
             <configuration>
-                <!--Si falta web.xml, NO falla el build.-->
                 <failOnMissingWebXml>false</failOnMissingWebXml>
             </configuration>
         </plugin>
     </plugins>
- </build>
+</build>
 </project>

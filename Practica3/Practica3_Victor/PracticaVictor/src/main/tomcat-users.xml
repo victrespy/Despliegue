@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomcat-users>
+
+  <!-- Roles de la calculadora -->
+  <role rolename="calc_basic"/>
+  <role rolename="calc_full"/>
+
+  <!-- Usuario con calculadora básica -->
+  <user username="basic_user" password="123" roles="calc_basic"/>
+
+  <!-- Usuario con calculadora completa -->
+  <user username="full_user" password="321" roles="calc_full"/>
+
+</tomcat-users>
