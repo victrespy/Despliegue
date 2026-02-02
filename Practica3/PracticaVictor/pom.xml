@@ -1,0 +1,60 @@
+<!--
+ pom.xml = configuración de Maven.
+ Maven se encarga de:
+ - Descargar dependencias
+ - Compilar el código Java
+ - Empaquetar la aplicación como WAR para desplegar en Tomcat
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+ <modelVersion>4.0.0</modelVersion>
+ 
+ <groupId>calculadora</groupId> <!-- Identidad del proyecto -->
+ <artifactId>calculadora</artifactId> <!-- artifactId: nombre del proyecto/artefacto -->
+ <version>1.0.0</version>
+ <packaging>war</packaging> <!-- packaging: indica que el resultado final será un WAR -->
+ 
+ <properties>
+    <!--
+    Versión de Java con la que compilamos.
+    Recomendación docente: usar 17 para evitar diferencias entre equipos.
+    -->
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+ </properties>
+
+
+ <dependencies>
+    <!--
+    API de Servlets Jakarta (para Tomcat 10).
+    scope=provided significa:
+    - Se necesita para COMPILAR
+    - NO se empaqueta dentro del WAR
+    - Porque Tomcat ya incluye esta librería en el servidor.
+    -->
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+ </dependencies>
+ <build>
+    <!--
+    finalName controla el nombre del fichero generado, generará:
+    target/calculadora.war
+    (Esto es útil para Docker)
+    -->
+    <finalName>calculadora</finalName>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.4.0</version>
+            <configuration>
+                <!--Si falta web.xml, NO falla el build.-->
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+        </plugin>
+    </plugins>
+ </build>
+</project>

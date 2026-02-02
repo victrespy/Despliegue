@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
+
+  <display-name>Calculadora</display-name>
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <!-- Proteger SOLO los JSP (no CSS, no imágenes, etc.) -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Calculadora</web-resource-name>
+      <url-pattern>/index.jsp</url-pattern>
+      <url-pattern>/logout.jsp</url-pattern>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>calc_basic</role-name>
+      <role-name>calc_full</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+        <web-resource-name>ApiCalcular</web-resource-name>
+        <url-pattern>/calcular</url-pattern>
+        <http-method>POST</http-method>
+      <!-- opcional: si también aceptas GET -->
+      <!-- <http-method>GET</http-method> -->
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>calc_basic</role-name>
+      <role-name>calc_full</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- Login FORM -->
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/login-error.jsp</form-error-page>
+    </form-login-config>
+  </login-config>
+
+  <security-role><role-name>calc_basic</role-name></security-role>
+  <security-role><role-name>calc_full</role-name></security-role>
+
+  <!-- Sesión corta (opcional) -->
+  <session-config>
+    <session-timeout>10</session-timeout>
+  </session-config>
+
+</web-app>

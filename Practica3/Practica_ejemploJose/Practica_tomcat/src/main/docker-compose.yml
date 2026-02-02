@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  tomcat:
+    image: tomcat:10.1
+    container_name: tomcat_t3
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ../../target/calculadora.war:/usr/local/tomcat/webapps/calculadora.war
+      - ./tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./server.xml:/usr/local/tomcat/conf/server.xml
+      - ./certs:/usr/local/tomcat/certs
+    restart: unless-stopped

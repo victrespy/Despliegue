@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  web.xml = descriptor de despliegue de la aplicación web.
+  Aquí definimos:
+  - Página de entrada (welcome-file)
+  - Seguridad (qué URLs se protegen y con qué roles)
+  - Tipo de login (FORM) y páginas de login/error
+  - Roles disponibles
+  - Tiempo de sesión
+-->
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
+
+  <!-- Nombre descriptivo de la aplicación (solo informativo) -->
+  <display-name>Calculadora</display-name>
+
+  <!--cuando el usuario entra a /calculadora/ se sirve automáticamente index.jsp-->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <!-- ============================================================
+       SEGURIDAD: proteger SOLO JSP concretos (no CSS, no imágenes)
+       ============================================================ -->
+  <security-constraint>
+    <!--
+      web-resource-collection: conjunto de recursos (URLs) a proteger
+      url-pattern: rutas que requieren autenticación/rol
+      Importante: al NO incluir /css/*, el CSS se carga sin login (buena práctica).
+    -->
+    <web-resource-collection>
+      <web-resource-name>Calculadora</web-resource-name>
+      <url-pattern>/index.jsp</url-pattern>
+      <url-pattern>/logout.jsp</url-pattern>
+    </web-resource-collection>
+
+    <!--
+      auth-constraint: roles permitidos para acceder a esos recursos.
+      Si el usuario NO tiene uno de estos roles, se deniega el acceso.
+    -->
+    <auth-constraint>
+      <role-name>calc_basic</role-name>
+      <role-name>calc_full</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- ============================================================
+       SEGURIDAD: proteger el endpoint del servlet /calcular (API)
+       ============================================================ -->
+  <security-constraint>
+    <!--Protegemos el servlet que calcula (la "API" que devuelve JSON).-->
+    <web-resource-collection>
+        <web-resource-name>ApiCalcular</web-resource-name>
+        <url-pattern>/calcular</url-pattern>
+        <http-method>POST</http-method>
+      <!-- opcional: si también aceptas GET -->
+      <!-- <http-method>GET</http-method> -->
+    </web-resource-collection>
+
+    <!--Mismos roles para esta zona.-->
+    <auth-constraint>
+      <role-name>calc_basic</role-name>
+      <role-name>calc_full</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- ============================================================
+       LOGIN FORM (autenticación mediante formulario)
+       ============================================================ -->
+  <login-config>
+    <!-- FORM = login con páginas JSP propias (no popup del navegador) -->
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <!-- Página donde se muestra el formulario de login -->
+      <form-login-page>/login.jsp</form-login-page>
+      <!-- Página a la que se redirige si el login falla -->
+      <form-error-page>/login-error.jsp</form-error-page>
+    </form-login-config>
+  </login-config>
+
+  <!--
+    Declaración de roles usados en este web.xml.
+    IMPORTANTE: deben coincidir con tomcat-users.xml.
+  -->
+  <security-role><role-name>calc_basic</role-name></security-role>
+  <security-role><role-name>calc_full</role-name></security-role>
+
+  <!-- Tiempo máximo de sesión en minutos. -->
+  <session-config>
+    <session-timeout>10</session-timeout>
+  </session-config>
+
+</web-app>
