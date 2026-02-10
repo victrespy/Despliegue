@@ -1,0 +1,31 @@
+services:
+  sftp:
+    # Imagen'atmoz/sftp' para crear el servidor SFTP
+    image: atmoz/sftp
+    # Nombre del contenedor
+    container_name: t4-sftp
+    # Mapeamos el puerto 22 del contenedor al 2222 de local
+    # para poder conectarnos desde nuestro PC
+    ports:
+    - "2222:22"
+    # Volumen necesario para configurar el directorio del contenedor
+    volumes:
+    - ./data/ftp/alumnos:/data
+    # Cuentas de usuario con sus credenciales
+    # y su directorio dentro del servidor
+    command: >
+      alumno1:Alumno123:1000:1000:/data/alumno1
+      alumno2:Alumno123:1001:1001:/data/alumno2
+      profesor:Profe123:1002:1002:/data/profesor
+    restart: unless-stopped
+
+  webdav:
+    image: nginx:alpine
+    container_name: t4-webdav
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./webdav/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./webdav/htpasswd:/etc/nginx/htpasswd:ro
+      - ./data/webdav/documentos:/data
+    restart: unless-stopped
